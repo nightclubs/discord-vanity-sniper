@@ -20,6 +20,7 @@ def __headers():
     
     }
 
+
 def __snipe__vanity():
  with requests.Session() as session:
     snipe_res    = session.patch(
@@ -29,10 +30,24 @@ def __snipe__vanity():
     )
 
     if config['vanity'] in snipe_res.text:
-        print(f">> [system] {config['vanity']} sniped! :: {config['guild_id']}")
+        print(f">> [system] {config['vanity']} sniped! :: {config['guild_id']}"); open('sniped.txt', 'a').write(f"{config['vanity']}:{config['guild_id']}\n")
     
     else:
         print(snipe_res.text)
 
+def __check__vanity():
+ with requests.Session() as session:
+    snipe_res    = session.get(
+        f"https://discord.com/api/v9/invites/{config['vanity']}", 
+         headers = __headers(), 
+    ).text
+
+    if 'vanity_url_code' in snipe_res:
+        pass
+    
+    elif 'Unknown Invite' in snipe_res:
+        __snipe__vanity()
+
+
 while True: 
- threading.Thread(target=__snipe__vanity).start()
+ threading.Thread(target=__check__vanity).start()
